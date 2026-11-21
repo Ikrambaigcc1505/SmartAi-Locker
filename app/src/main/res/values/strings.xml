@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SmartAi Locker</string>
+    <string name="disguise_calculator_name">Calculator</string>
+    <string name="disguise_notes_name">Field Notes</string>
+    <string name="accessibility_service_description">Monitors foreground app switches locally on-device to lock protected apps and System Settings.</string>
+    <string name="device_admin_description">Prevents unauthorized uninstallation of SmartAi Locker without your Master PIN or Biometric verification.</string>
+    <string name="monitor_service_description">Keeps SmartAi Locker protection active locally in the background.</string>
+    <!-- Live Google AdMob Application ID -->
+    <string name="admob_app_id">ca-app-pub-5015993859793728~8464255789</string>
+</resources>

@@ -1,0 +1,6 @@
+{
+  "name": "SmartAi Locker",
+  "description": "SmartAi Locker is an offline Android security vault and app locker with PIN, pattern, and biometric authentication, encrypted media vault, stealth intruder detection, and smart local categorization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

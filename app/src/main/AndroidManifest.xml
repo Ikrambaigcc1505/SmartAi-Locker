@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- =========================================================================
+         PERMISSIONS CONFIGURATION (AndroidManifest.xml)
+         Note for cross-platform iOS Info.plist equivalents:
+         - CAMERA -> NSCameraUsageDescription (AI Intruder Selfie capture)
+         - USE_BIOMETRIC -> NSFaceIDUsageDescription (FaceID / TouchID unlock)
+         - Photo/Media import uses zero-permission Android Photo Picker & SAF
+           (iOS equivalent: NSPhotoLibraryUsageDescription / PHPickerViewController)
+         ========================================================================= -->
+
+    <!-- Network permissions used exclusively by Google Mobile Ads SDK (no backend server) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Opt out of deprecated Privacy Sandbox AdServices to prevent MEASUREMENT_SERVICE null binding errors -->
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_AD_ID"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_TOPICS"
+        tools:node="remove" />
+
+    <!-- Biometric Authentication (Fingerprint / Face Unlock) -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- AI Intruder Selfie front-camera capture (requested at runtime) -->
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Tactile feedback for PIN & Pattern lock interactions -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- App Locker: Usage Stats, Overlay, Boot Persistence, Foreground Guard, OEM Battery Exemption -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Least-privilege app discovery for App Locker (avoids broad QUERY_ALL_PACKAGES) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".SmartAiApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication">
+
+        <!-- Google AdMob Application ID & Background Optimization Flags -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5015993859793728~8464255789" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true" />
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:node="remove" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MyApplication" />
+
+        <!-- Default Launcher Identity -->
+        <activity-alias
+            android:name=".DefaultLauncherAlias"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Secret Calculator Disguise Alias -->
+        <activity-alias
+            android:name=".CalculatorLauncherAlias"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_disguise_calc"
+            android:label="@string/disguise_calculator_name"
+            android:roundIcon="@drawable/ic_disguise_calc"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Compass / Field Notes Disguise Alias -->
+        <activity-alias
+            android:name=".NotesLauncherAlias"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_disguise_notes"
+            android:label="@string/disguise_notes_name"
+            android:roundIcon="@drawable/ic_disguise_notes"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Boot & App Update Receiver to restart local App Lock monitor -->
+        <receiver
+            android:name=".security.BootCompletedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Anti-Kill Local App Lock Monitoring Service -->
+        <service
+            android:name=".security.AppLockMonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Local foreground app lock monitoring using UsageStats without network transmission." />
+        </service>
+
+        <!-- SensorManager Service for Shake & Face-Down Panic Lock -->
+        <service
+            android:name=".security.PanicLockSensorService"
+            android:exported="false" />
+
+        <!-- Device Admin Receiver for Anti-Uninstall Protection -->
+        <receiver
+            android:name=".security.SmartLockDeviceAdminReceiver"
+            android:description="@string/device_admin_description"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_policies" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Accessibility Service for App & System Settings Lock Guard -->
+        <service
+            android:name=".security.AppLockAccessibilityService"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+    </application>
+
+</manifest>
